@@ -1,0 +1,22 @@
+#Wetterstation Wasserschutzpolizei
+
+## Historic Data
+https://data.stadt-zuerich.ch/dataset/sid_wapo_wetterstationen
+
+## Online Data
+
+https://tecdottir.herokuapp.com/docs/
+
+curl -X GET --header 'Accept: application/json' 'https://tecdottir.herokuapp.com/measurements/tiefenbrunnen?startDate=2017-05-04&endDate=2017-05-06'
+curl -X GET --header 'Accept: application/json' 'https://tecdottir.herokuapp.com/measurements/mythenquai?startDate=2017-05-04&endDate=2017-05-06'
+
+
+# OpenWeather
+https://openweathermap.org/
+
+Historic -> no free
+Online -> free
+
+
+# Wetter Schweiz
+https://opendata.swiss/en/organization/bundesamt-fur-meteorologie-und-klimatologie-meteoschweiz
