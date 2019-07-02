@@ -1,18 +1,57 @@
 # Weather Station
 
-## InfluxData TICK Stack
+## TICK Stack Installation
+
+### On Raspberry Pi
+
+Please follow [this procedure](https://www.influxdata.com/blog/running-the-tick-stack-on-a-raspberry-pi/) to install the TICK stack on your Raspberry Pi.
+
+### On Raspberry Pi using Docker 
+
+#### Docker Installation 
+
+See also [here](https://blog.docker.com/2019/03/happy-pi-day-docker-raspberry-pi)
+
+```bash
+sudo apt-get update
+sudo apt-get install apt-transport-https ca-certificates software-properties-common -y
+curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
+sudo usermod -aG docker pi
+sudo curl https://download.docker.com/linux/raspbian/gpg
+echo "deb https://download.docker.com/linux/raspbian/ stretch stable" > /etc/apt/sources.list
+sudo apt-get update
+sudo apt-get upgrade
+rm get-docker.sh
+sudo systemctl start docker.service
+sudo usermod -a -G docker $USER
+# restart your system (prevents later issues in case a kernel update took place - exit and login might not be enough)
+docker info
+```
+
+#### Docker-Compose Installation
+
+See also [here](https://jonathanmeier.io/install-docker-and-docker-compose-raspberry-pi/)
+
+```bash
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && sudo python3 get-pip.py
+rm get-pip.py
+sudo pip3 install docker-compose
+```
+
+#### Sandbox Installation
 
 [Sandbox](https://github.com/influxdata/sandbox) provides a TICK Stack that runs with Docker.
 
 ```bash
+mkdir git && cd git
 git clone https://github.com/influxdata/sandbox.git
-cd sandbox 
 ./sandbox up
 ```
 
 ## Load Weather Data
 
-Use [Import_Data.py](Import_Data.py) to import weather data from the a dataset provided by the [Wasserschutzpolizei Zurich](https://data.stadt-zuerich.ch/dataset/sid_wapo_wetterstationen). Once a day, this script also imports recent data using their [REST API](https://tecdottir.herokuapp.com/docs/).
+This challenge uses the weather data provided by the [Wasserschutzpolizei Zurich](https://data.stadt-zuerich.ch/dataset/sid_wapo_wetterstationen).
+The [weatherstation-api package](https://pypi.org/project/fhnw-ds-hs2019-weatherstation-api/) provides the means to read historic and live data.
 
 ## Visualize Data
 
@@ -22,18 +61,12 @@ The TICK Stack comes with Chronograf. It runs on `http://localhost:8888` and pro
 
 ![alt text](./pics/query_01.png "Visualization of air temperature")
 
-## Jupiter Notebook
+In order to get started you can import this simple [Dashboard](dashboard/Simple_Dashboard.json)
 
-I used a [jupiter notebook](Import_Data.ipynb) to craft the [python code](Import_Data.py). Either use your local installation or run
+Otherwise use following procedure:
+- Dashboards -> Create Dashbord
+- Add Data
+- Select "meteorology.autogen" -> mythenquai -> air_temperature
+- Make sure you select a large enough duration (e.g. "Past 30d")
+- You might want to add a second query (e.g. for "tiefenbrunnen")
 
-```bash
-docker run --name datascience-notebook --net=host -p 8888:8888 -v "$(pwd)":/home/jovyan/work -it --rm i4ds/datascience-notebook start-notebook.sh --NotebookApp.token=''
-firefox http://127.0.0.1:8888
-```
-
-In order to extract the python script run
-
-```bash
-docker exec -it datascience-notebook /bin/bash
-jupyter nbconvert --to script Import_Data.ipynb
-```

@@ -1,0 +1,189 @@
+{
+	"meta": {
+		"chronografVersion": "1.7.11",
+		"sources": {
+			"10000": {
+				"name": "My InfluxDB",
+				"link": "/chronograf/v1/sources/10000"
+			}
+		}
+	},
+	"dashboard": {
+		"id": 3,
+		"cells": [
+			{
+				"i": "10c76631-4a9e-4bde-b844-7c623d0509b7",
+				"x": 0,
+				"y": 0,
+				"w": 9,
+				"h": 4,
+				"name": "Untitled Graph",
+				"queries": [
+					{
+						"query": "SELECT mean(\"air_temperature\") AS \"mean_air_temperature\" FROM \"meteorology\".\"autogen\".\"mythenquai\" WHERE time > now() - 30d GROUP BY time(10m) FILL(null)",
+						"queryConfig": {
+							"database": "meteorology",
+							"measurement": "mythenquai",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "mean",
+									"type": "func",
+									"alias": "mean_air_temperature",
+									"args": [
+										{
+											"value": "air_temperature",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {},
+							"groupBy": {
+								"time": "10m",
+								"tags": []
+							},
+							"areTagsAccepted": false,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/10000",
+						"type": "influxql"
+					},
+					{
+						"query": "SELECT mean(\"air_temperature\") AS \"mean_air_temperature\" FROM \"meteorology\".\"autogen\".\"tiefenbrunnen\" WHERE time > now() - 30d GROUP BY time(10m) FILL(null)",
+						"queryConfig": {
+							"database": "meteorology",
+							"measurement": "tiefenbrunnen",
+							"retentionPolicy": "autogen",
+							"fields": [
+								{
+									"value": "mean",
+									"type": "func",
+									"alias": "mean_air_temperature",
+									"args": [
+										{
+											"value": "air_temperature",
+											"type": "field",
+											"alias": ""
+										}
+									]
+								}
+							],
+							"tags": {},
+							"groupBy": {
+								"time": "10m",
+								"tags": []
+							},
+							"areTagsAccepted": false,
+							"fill": "null",
+							"rawText": null,
+							"range": null,
+							"shifts": null
+						},
+						"source": "/chronograf/v1/sources/10000",
+						"type": "influxql"
+					}
+				],
+				"axes": {
+					"x": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					},
+					"y2": {
+						"bounds": [
+							"",
+							""
+						],
+						"label": "",
+						"prefix": "",
+						"suffix": "",
+						"base": "10",
+						"scale": "linear"
+					}
+				},
+				"type": "line",
+				"colors": [
+					{
+						"id": "2b96a0bb-e733-4a8d-8073-fd33304d4724",
+						"type": "scale",
+						"hex": "#31C0F6",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "ef4193d2-8f6d-4093-b61b-d449e7aea619",
+						"type": "scale",
+						"hex": "#A500A5",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					},
+					{
+						"id": "66fb3b98-6376-498d-809d-759c5bb61fdf",
+						"type": "scale",
+						"hex": "#FF7E27",
+						"name": "Nineteen Eighty Four",
+						"value": "0"
+					}
+				],
+				"legend": {},
+				"tableOptions": {
+					"verticalTimeAxis": true,
+					"sortBy": {
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					},
+					"wrapping": "truncate",
+					"fixFirstColumn": true
+				},
+				"fieldOptions": [
+					{
+						"internalName": "time",
+						"displayName": "",
+						"visible": true
+					}
+				],
+				"timeFormat": "MM/DD/YYYY HH:mm:ss",
+				"decimalPlaces": {
+					"isEnforced": true,
+					"digits": 2
+				},
+				"note": "",
+				"noteVisibility": "default",
+				"links": {
+					"self": "/chronograf/v1/dashboards/3/cells/10c76631-4a9e-4bde-b844-7c623d0509b7"
+				}
+			}
+		],
+		"templates": [],
+		"name": "Simple Dashboard",
+		"organization": "default",
+		"links": {
+			"self": "/chronograf/v1/dashboards/3",
+			"cells": "/chronograf/v1/dashboards/3/cells",
+			"templates": "/chronograf/v1/dashboards/3/templates"
+		}
+	}
+}
