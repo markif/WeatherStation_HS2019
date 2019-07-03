@@ -11,16 +11,23 @@ wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/data/
 cd ..
 ```
 
-# Install Dependencies
+# Install Dependencies (Raspberry Pi)
 
 ```bash
-sudo python3 -m pip install fhnw_ds_hs2019_weatherstation_api
+wget https://github.com/jjhelmus/berryconda/releases/download/v2.0.0/Berryconda3-2.0.0-Linux-armv7l.sh
+chmod +x Berryconda3-2.0.0-Linux-armv7l.sh
+./Berryconda3-2.0.0-Linux-armv7l.sh
+sudo shutdown -r now
+rm Berryconda3-2.0.0-Linux-armv7l.sh
+python -m pip install --upgrade pip
+conda install pandas
+python -m pip install influxdb tzlocal fhnw_ds_hs2019_weatherstation_api
 ```
 
 # Usage
 
 ```python
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 # import the library
 from fhnw_ds_hs2019_weatherstation_api import data_import as weather
@@ -30,6 +37,8 @@ import os
 config = weather.Config()
 # define CSV path
 config.historic_data_folder='.'+os.sep+'data'
+# set batch size for DB inserts (decrease for raspberry pi)
+config.historic_data_chunksize=10000
 # define DB host
 config.db_host='localhost'
 

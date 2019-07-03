@@ -29,6 +29,8 @@ class Config:
     db_port=8086
     db_name='meteorology'
     stations = ['mythenquai', 'tiefenbrunnen']
+    stations_force_query_last_entry = True
+    stations_last_entries = {}
     keys_mapping = {
         "values.air_temperature.value": "air_temperature",
         "values.barometric_pressure_qfe.value": "barometric_pressure_qfe",
@@ -45,6 +47,8 @@ class Config:
         "values.windchill.value": "windchill"
     }
     historic_data_folder = '.'+os.sep+'data'
+    historic_data_chunksize = 10000
+    historic_data_sleep_sec = 0
     client = None
     
 
@@ -52,17 +56,41 @@ class Config:
 # In[3]:
 
 
+def __set_last_db_entry(config, station, entry):
+    current_last_time = __extract_last_db_day(config.stations_last_entries.get(station, None), station, None)
+    entry_time = __extract_last_db_day(entry, station, None)
+    
+    if current_last_time is None and entry_time is not None:
+        config.stations_last_entries[station] = entry
+    elif current_last_time is not None and entry_time is not None and current_last_time < entry_time:
+        config.stations_last_entries[station] = entry
+
 def __get_last_db_entry(config, station):
-    query = "SELECT * FROM \"{}\" ORDER BY time DESC LIMIT 1".format(station)
-    last = config.client.query(query)
-    return last
+    last_entry = None
+    if not config.stations_force_query_last_entry:
+        # speedup for Raspberry Pi - last entry query takes > 2 Sec.!
+        last_entry = config.stations_last_entries.get(station, None)
+    
+    if last_entry is None:
+        try:
+            # we are only interested in time, however need to provide any field to make query work
+            query = "SELECT last(air_temperature) FROM \"{}\"".format(station)
+            last_entry = config.client.query(query)
+        except:
+            # There are influxDB versions which have an issue with above "last" query
+            print("An exception occurred while querying last entry from DB for "+ station +". Try alternative approach.") 
+            query = "SELECT * FROM \"{}\" ORDER BY time DESC LIMIT 1".format(station)
+            last_entry = config.client.query(query) 
+        
+    __set_last_db_entry(config, station, last_entry)
+    return last_entry
     
 def __extract_last_db_day(last_entry, station, default_last_db_day):
-    val = last_entry[station]
-          
-    if val is not None: 
-        if not val.index.empty:
-            return val.index[0]
+    if last_entry is not None:
+        val = last_entry.get(station, None)
+        if val is not None: 
+            if not val.index.empty:
+                return val.index[0]
         
     return default_last_db_day
 
@@ -115,6 +143,7 @@ def __clean_data(config, data_of_last_day, last_db_entry, date_format, station):
         
 def __add_data_to_db(config, data, station):
     config.client.write_points(data, station, time_precision='s', database=config.db_name)
+    __set_last_db_entry(config, station, data.tail(1))
     
 def __append_df_to_csv(data, csv_file_path, sep=","):
     header = False
@@ -156,7 +185,6 @@ def import_historic_data(config):
 
    """
     # read historic data from files
-    chunksize = 10000
     
     for station in config.stations:
         last_entry = __get_last_db_entry(config, station)
@@ -167,9 +195,13 @@ def import_historic_data(config):
             file_name = os.path.join(config.historic_data_folder ,"messwerte_" + station + "_2007-2018.csv")
             if os.path.isfile(file_name):
                 print("\tLoad "+ file_name)
-                for chunk in pd.read_csv(file_name, delimiter=',', chunksize=chunksize):
+                for chunk in pd.read_csv(file_name, delimiter=',', chunksize=config.historic_data_chunksize):
                     chunk = __define_types(chunk, '%Y-%m-%dT%H:%M:%S')
+                    print("Add "+ station +" from "+ str(chunk.index[0]) +" to "+ str(chunk.index[-1]))
                     __add_data_to_db(config, chunk, station)
+                    
+                    if config.historic_data_sleep_sec > 0:
+                        sleep(config.historic_data_sleep_sec)
             else:
                 print(file_name +" does not seem to exist.")
                 
@@ -179,9 +211,13 @@ def import_historic_data(config):
                 file_name = os.path.join(config.historic_data_folder ,"messwerte_" + station + "_"+ str(running_year) +".csv")
                 if os.path.isfile(file_name):
                     print("\tLoad "+ file_name)
-                    for chunk in pd.read_csv(file_name, delimiter=',', chunksize=chunksize):
+                    for chunk in pd.read_csv(file_name, delimiter=',', chunksize=config.historic_data_chunksize):
                         chunk = __define_types(chunk, '%Y-%m-%d %H:%M:%S')
+                        print("Add "+ station +" from "+ str(chunk.index[0]) +" to "+ str(chunk.index[-1]))
                         __add_data_to_db(config, chunk, station)
+                        
+                        if config.historic_data_sleep_sec > 0:
+                            sleep(config.historic_data_sleep_sec)
                 else:
                     print(file_name +" does not seem to exist.")
                 running_year+=1
@@ -250,6 +286,6 @@ def import_latest_data(config, append_to_csv=False, periodic_read=False):
                 print("No new data received for "+station)
 
 
-# In[7]:
+# In[4]:
 
 

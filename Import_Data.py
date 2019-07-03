@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 
 import sys
-get_ipython().system('{sys.executable} -m pip install ./fhnw_ds_hs2019_weatherstation_api/dist/fhnw_ds_hs2019_weatherstation_api-0.1-py3-none-any.whl')
+get_ipython().system('{sys.executable} -m pip install ./fhnw_ds_hs2019_weatherstation_api/dist/fhnw_ds_hs2019_weatherstation_api-0.11-py3-none-any.whl')
 
 
-# In[2]:
+# In[3]:
 
 
 from fhnw_ds_hs2019_weatherstation_api import data_import as weather
@@ -21,12 +21,14 @@ config.historic_data_folder='.'+os.sep+'data'
 # define DB host
 config.db_host='localhost'
 
-client = weather.DataFrameClient(host=config.db_host, port=config.db_port, database=config.db_name)
-client.switch_database(config.db_name)
+# connect to DB
+weather.connect_db(config)
 # clean DB
-weather.clean_db(client, config)
-weather.read_historic_data_from_file(client, config)
-weather.read_data_from_api(client, config, append_to_csv=False, periodic_read=False)
+weather.clean_db(config)
+# import historic data
+weather.import_historic_data(config)
+# import latest data (delta between last data point in DB and current time)
+weather.import_latest_data(config)
 
 
 # In[ ]:

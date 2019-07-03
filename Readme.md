@@ -2,13 +2,46 @@
 
 ## TICK Stack Installation
 
-### On Raspberry Pi
+### Raspberry Pi
+
+#### System Tuning
+
+[Enable ZRAM](https://github.com/novaspirit/rpi_zram) and disable Swap
+
+```bash
+sudo wget -O /usr/bin/zram.sh https://raw.githubusercontent.com/novaspirit/rpi_zram/master/zram.sh
+sudo chmod +x /usr/bin/zram.sh
+# add as second last line (before exit 0)
+sed -i "`wc -l < /etc/rc.local`i\\/usr/bin/zram.sh &\\" /etc/rc.local
+sudo shutdown -r now
+```
+
+Alternatively, [increase Swap](https://wpitchoune.net/tricks/raspberry_pi3_increase_swap_size.html) and set swappiness as low as possible
+
+```bash
+sudo dphys-swapfile swapoff
+echo "CONF_SWAPSIZE=1024" | sudo tee -a /etc/dphys-swapfile
+echo "vm.swappiness = 1" | sudo tee -a /etc/sysctl.conf
+sudo dphys-swapfile swapon
+sudo shutdown -r now
+```
+
+#### TICK Installation Native
 
 Please follow [this procedure](https://www.influxdata.com/blog/running-the-tick-stack-on-a-raspberry-pi/) to install the TICK stack on your Raspberry Pi.
 
-### On Raspberry Pi using Docker 
+```bash
+curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+# make sure you use the correct version name (stretch)
+echo "deb https://repos.influxdata.com/debian stretch stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+sudo apt-get install influxdb 
+# install these if needed
+sudo apt-get install telegraf chronograf kapacitor
+```
 
-#### Docker Installation 
+#### TICK Installation using Docker 
+
+##### Docker Installation 
 
 See also [here](https://blog.docker.com/2019/03/happy-pi-day-docker-raspberry-pi)
 
@@ -18,7 +51,7 @@ sudo apt-get install apt-transport-https ca-certificates software-properties-com
 curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
 sudo usermod -aG docker pi
 sudo curl https://download.docker.com/linux/raspbian/gpg
-echo "deb https://download.docker.com/linux/raspbian/ stretch stable" > /etc/apt/sources.list
+echo "deb https://download.docker.com/linux/raspbian/ stretch stable" | sudo tee -a etc/apt/sources.list
 sudo apt-get update
 sudo apt-get upgrade
 rm get-docker.sh
@@ -28,7 +61,7 @@ sudo usermod -a -G docker $USER
 docker info
 ```
 
-#### Docker-Compose Installation
+##### Docker-Compose Installation
 
 See also [here](https://jonathanmeier.io/install-docker-and-docker-compose-raspberry-pi/)
 
@@ -38,7 +71,7 @@ rm get-pip.py
 sudo pip3 install docker-compose
 ```
 
-#### Sandbox Installation
+##### Sandbox Installation
 
 [Sandbox](https://github.com/influxdata/sandbox) provides a TICK Stack that runs with Docker.
 
