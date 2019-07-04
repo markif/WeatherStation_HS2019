@@ -4,7 +4,7 @@ with open("Readme.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='fhnw_ds_hs2019_weatherstation_api',
-      version='0.12',
+      version='0.13',
       description='Provides access to the Wasserschutzpolizei Zurich live and historic weather data.',
       long_description=long_description,
       long_description_content_type="text/markdown",

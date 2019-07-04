@@ -29,7 +29,7 @@ class Config:
     db_port=8086
     db_name='meteorology'
     stations = ['mythenquai', 'tiefenbrunnen']
-    stations_force_query_last_entry = True
+    stations_force_query_last_entry = False
     stations_last_entries = {}
     keys_mapping = {
         "values.air_temperature.value": "air_temperature",
@@ -59,7 +59,7 @@ class Config:
 def __set_last_db_entry(config, station, entry):
     current_last_time = __extract_last_db_day(config.stations_last_entries.get(station, None), station, None)
     entry_time = __extract_last_db_day(entry, station, None)
-    
+
     if current_last_time is None and entry_time is not None:
         config.stations_last_entries[station] = entry
     elif current_last_time is not None and entry_time is not None and current_last_time < entry_time:
@@ -87,7 +87,12 @@ def __get_last_db_entry(config, station):
     
 def __extract_last_db_day(last_entry, station, default_last_db_day):
     if last_entry is not None:
-        val = last_entry.get(station, None)
+        val = None
+        if isinstance(last_entry, pd.DataFrame):
+            val = last_entry
+        elif isinstance(last_entry, dict):
+            val = last_entry.get(station, None)   
+            
         if val is not None: 
             if not val.index.empty:
                 return val.index[0]
@@ -95,6 +100,8 @@ def __extract_last_db_day(last_entry, station, default_last_db_day):
     return default_last_db_day
 
 def __get_data_of_day(day, station):
+    # convert to local time of station
+    day = day.tz_convert('Europe/Zurich')
     base_url = 'https://tecdottir.herokuapp.com/measurements/{}'
     day_str = day.strftime("%Y-%m-%d")
     print("Query "+ station +" at "+day_str)
@@ -110,8 +117,8 @@ def __get_data_of_day(day, station):
         
 def __define_types(data, date_format):
     data['timestamp_cet'] = pd.to_datetime(data['timestamp_cet'], format=date_format)
-    # set the correct timezone
-    #data['timestamp_cet'] = data['timestamp_cet'].dt.tz_localize('Europe/Zurich')
+    if not data.empty and data['timestamp_cet'].iloc[0].tzinfo is None:
+        data['timestamp_cet'] = data['timestamp_cet'].dt.tz_localize('Europe/Zurich', ambiguous=True).dt.tz_convert('UTC')
     data.set_index('timestamp_cet', inplace=True)
     
     for column in data.columns[0:]:
@@ -136,7 +143,13 @@ def __clean_data(config, data_of_last_day, last_db_entry, date_format, station):
     #print("Last db index "+str(lastDBEntry[station].index))
     
     # remove all entries older than last element
-    last_db_entry_time = last_db_entry[station].index[0].replace(tzinfo=None)   
+    last_db_entry_time = None
+    if isinstance(last_db_entry, pd.DataFrame):
+        last_db_entry_time = last_db_entry
+    elif isinstance(last_db_entry, dict):
+        last_db_entry_time = last_db_entry.get(station, None) 
+    last_db_entry_time = last_db_entry_time.index[0] #.replace(tzinfo=None)
+    # print("Last "+str(last_db_entry_time) +" elements "+str(normalized.index[0]) +" - "+str(normalized.index[-1]))
     normalized.drop(normalized[normalized.index <= last_db_entry_time].index, inplace=True)
     
     return normalized
@@ -176,6 +189,7 @@ def clean_db(config):
    """
     config.client.drop_database(config.db_name)
     config.client.create_database(config.db_name)
+    config.stations_last_entries.clear()
 
 def import_historic_data(config):
     """Reads the historic data of the Wasserschutzpolizei Zurich from CSV files
@@ -221,7 +235,8 @@ def import_historic_data(config):
                 else:
                     print(file_name +" does not seem to exist.")
                 running_year+=1
-            
+        else:
+            print("There is already data for "+station + ". No historic data will be imported.")
     
         print("Historic data for "+station+" loaded.")
         
@@ -237,8 +252,8 @@ def import_latest_data(config, append_to_csv=False, periodic_read=False):
    """
     # access API for current data
     current_time = datetime.datetime.now(pytz.utc)
-    last_api_call = current_time.replace(second=0, microsecond=0) - datetime.timedelta(minutes=10)
-    last_db_days = [last_api_call] * len(config.stations)
+    current_day = current_time.replace(hour=0, minute=0, second=0, microsecond=0)
+    last_db_days = [current_day] * len(config.stations)
     new_data_received = True
 
     for idx, station in enumerate(config.stations):
@@ -253,7 +268,8 @@ def import_latest_data(config, append_to_csv=False, periodic_read=False):
         current_time = datetime.datetime.now(pytz.utc)
 
         # check if all historic data (retrieved from API) has been processed 
-        if periodic_read and max(last_db_days) >= last_api_call: 
+        last_db_day = max(last_db_days)
+        if periodic_read and last_db_day >= current_day: 
             # once every 10 Min
             sleep_until = current_time + datetime.timedelta(minutes=10)       
             # once per day
@@ -264,7 +280,7 @@ def import_latest_data(config, append_to_csv=False, periodic_read=False):
             print("Sleep for "+str(sleep_sec) + "s (from " + str(current_time) +" until "+str(sleep_until) + ") when next data will be queried.")
             sleep(sleep_sec)
             current_time = datetime.datetime.now(pytz.utc)
-            last_api_call = current_time.replace(second=0, microsecond=0)
+            current_day = current_time.replace(hour=0, minute=0, second=0, microsecond=0)
         elif not periodic_read and not new_data_received:
             # stop here
             return;
@@ -274,6 +290,7 @@ def import_latest_data(config, append_to_csv=False, periodic_read=False):
             last_db_entry = __get_last_db_entry(config, station)
             last_db_days[idx] = __extract_last_db_day(last_db_entry, station, last_db_days[idx])
             data_of_last_db_day = __get_data_of_day(last_db_days[idx], station)
+
             normalized_data = __clean_data(config, data_of_last_db_day, last_db_entry, '%d.%m.%Y %H:%M:%S', station)
 
             if normalized_data.size > 0:
