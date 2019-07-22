@@ -12,7 +12,7 @@
 sudo wget -O /usr/bin/zram.sh https://raw.githubusercontent.com/novaspirit/rpi_zram/master/zram.sh
 sudo chmod +x /usr/bin/zram.sh
 # add as second last line (before exit 0)
-sed -i "`wc -l < /etc/rc.local`i\\/usr/bin/zram.sh &\\" /etc/rc.local
+sudo sed -i "`wc -l < /etc/rc.local`i\\/usr/bin/zram.sh &\\" /etc/rc.local
 sudo shutdown -r now
 ```
 
