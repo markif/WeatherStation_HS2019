@@ -163,7 +163,7 @@ def __append_df_to_csv(data, csv_file_path, sep=","):
     if not os.path.isfile(csv_file_path):
         header = True
 
-    data.to_csv(csv_file_path, mode='a', sep=sep, header=header)
+    data.to_csv(csv_file_path, mode='a', sep=sep, header=header, date_format='%Y-%m-%d %H:%M:%S%z')
     
 def __signal_handler(sig, frame):
     sys.exit(0)
@@ -226,7 +226,7 @@ def import_historic_data(config):
                 if os.path.isfile(file_name):
                     print("\tLoad "+ file_name)
                     for chunk in pd.read_csv(file_name, delimiter=',', chunksize=config.historic_data_chunksize):
-                        chunk = __define_types(chunk, '%Y-%m-%d %H:%M:%S')
+                        chunk = __define_types(chunk, '%Y-%m-%d %H:%M:%S%z')
                         print("Add "+ station +" from "+ str(chunk.index[0]) +" to "+ str(chunk.index[-1]))
                         __add_data_to_db(config, chunk, station)
                         
