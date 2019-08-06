@@ -21,7 +21,7 @@ sudo shutdown -r now
 rm Berryconda3-2.0.0-Linux-armv7l.sh
 python -m pip install --upgrade pip
 conda install pandas
-python -m pip install influxdb tzlocal fhnw_ds_hs2019_weatherstation_api
+python -m pip install influxdb tzlocal pytz fhnw_ds_hs2019_weatherstation_api --upgrade
 ```
 
 # Usage
