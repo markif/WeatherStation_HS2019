@@ -1,8 +1,26 @@
 # Weather Station
 
+## Prerequisites
+
+Make sure your Raspberry Pi can connect to the internet (e.g. open a Web-Browser and enter your credentials).
+
+Make sure the time is correct (at FHNW your Pi is not abble to connect to the internet at startup to sync the time).
+
+```bash
+sudo date -s "13 AUG 2019 15:43:00"
+sudo shutdown -r now
+```
+
+Make sure you use newest software
+
+```bash
+sudo apt-get update
+sudo apt-get upgrade 
+```
+
 ## TICK Stack Installation
 
-### Raspberry Pi
+### Raspberry Pi 3
 
 #### System Tuning
 
@@ -26,59 +44,21 @@ sudo dphys-swapfile swapon
 sudo shutdown -r now
 ```
 
+### Raspberry Pi (all)
+
 #### TICK Installation Native
 
 Please follow [this procedure](https://www.influxdata.com/blog/running-the-tick-stack-on-a-raspberry-pi/) to install the TICK stack on your Raspberry Pi.
 
 ```bash
 curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -
-# make sure you use the correct version name (stretch)
-echo "deb https://repos.influxdata.com/debian stretch stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+# make sure you use the correct version name (buster)
+echo "deb https://repos.influxdata.com/debian buster stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+sudo apt-get update
 sudo apt-get install influxdb 
+sudo systemctl restart influxdb
 # install these if needed
 sudo apt-get install telegraf chronograf kapacitor
-```
-
-#### TICK Installation using Docker 
-
-##### Docker Installation 
-
-See also [here](https://blog.docker.com/2019/03/happy-pi-day-docker-raspberry-pi)
-
-```bash
-sudo apt-get update
-sudo apt-get install apt-transport-https ca-certificates software-properties-common -y
-curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
-sudo usermod -aG docker pi
-sudo curl https://download.docker.com/linux/raspbian/gpg
-echo "deb https://download.docker.com/linux/raspbian/ stretch stable" | sudo tee -a etc/apt/sources.list
-sudo apt-get update
-sudo apt-get upgrade
-rm get-docker.sh
-sudo systemctl start docker.service
-sudo usermod -a -G docker $USER
-# restart your system (prevents later issues in case a kernel update took place - exit and login might not be enough)
-docker info
-```
-
-##### Docker-Compose Installation
-
-See also [here](https://jonathanmeier.io/install-docker-and-docker-compose-raspberry-pi/)
-
-```bash
-curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && sudo python3 get-pip.py
-rm get-pip.py
-sudo pip3 install docker-compose
-```
-
-##### Sandbox Installation
-
-[Sandbox](https://github.com/influxdata/sandbox) provides a TICK Stack that runs with Docker.
-
-```bash
-mkdir git && cd git
-git clone https://github.com/influxdata/sandbox.git
-./sandbox up
 ```
 
 ## Load Weather Data
@@ -102,4 +82,14 @@ Otherwise use following procedure:
 - Select "meteorology.autogen" -> mythenquai -> air_temperature
 - Make sure you select a large enough duration (e.g. "Past 30d")
 - You might want to add a second query (e.g. for "tiefenbrunnen")
+
+
+# Reinstall Raspbian
+
+You should do this if you really need to!
+
+1. Format your SD Card by following [this](https://www.raspberrypi.org/documentation/installation/sdxc_formatting.md) (alternatively you might want to use [this](https://www.disk-partition.com/articles/raspberry-pi-sd-card-format-4125.html) for windows or [this](https://www.pcworld.com/article/3176712/how-to-format-an-sd-card-in-linux.html) for linux) procedure.
+2. Install the operating system by following [this](https://www.raspberrypi.org/documentation/installation/installing-images/) procedure.
+
+
 

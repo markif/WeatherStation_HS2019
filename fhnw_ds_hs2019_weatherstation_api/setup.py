@@ -4,7 +4,7 @@ with open("Readme.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='fhnw_ds_hs2019_weatherstation_api',
-      version='0.17',
+      version='0.18',
       description='Provides access to the Wasserschutzpolizei Zurich live and historic weather data.',
       long_description=long_description,
       long_description_content_type="text/markdown",
@@ -12,14 +12,14 @@ setup(name='fhnw_ds_hs2019_weatherstation_api',
       author='Fabian',
       license='MIT',
       packages=['fhnw_ds_hs2019_weatherstation_api'],
- #     install_requires=[
- #         'pandas',
- #         'numpy',
- #         'influxdb',
- #         'requests',
- #         'json',
- #         'datetime',
- #         'tzlocal',
- #         'pytz',
- #     ],
+      install_requires=[
+          'pandas',
+          'numpy',
+          'influxdb',
+          'requests',
+          'json',
+          'datetime',
+          'tzlocal',
+          'pytz',
+      ],
       zip_safe=False)
