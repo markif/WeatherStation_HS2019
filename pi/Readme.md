@@ -9,16 +9,12 @@ cd /scripts/mail_ip
 
 # download the script
 sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/pi/src/main.py
+sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/pi/src/secrets.py
+sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/pi/src/send-ip.service
 sudo chmod +x main.py
 
-# replace where appropriate 
-sudo cat > secrets.py <<EOL
-sender_address = "yourname@gmail.com"
-sender_password = "your password"
-sender_server = 'smtp.gmail.com'
-sender_port = 587
-recipient_address = "yourrecipient@outlookc.com"
-EOL
+# replace placeholders where appropriate 
+sudo nano secrets.py
 sudo chmod 700 secrets.py
 
 
@@ -26,21 +22,7 @@ sudo chmod 700 secrets.py
 python3 main.py
 
 # make sure it gets executed on startup
-sudo cat > /lib/systemd/system/send-ip.service <<EOL
-[Unit]
-Description=Send IP Address
-Wants=network-online.target
-After=network.target network-online.target
-
-[Service]
-Type=idle
-ExecStart=/usr/bin/python3 /scripts/mail_ip/main.py > /scripts/mail_ip/mail_ip.log 2>&1
-
-[Install]
-WantedBy=network-online.target
-EOL
-
-# enable service
+sudo cp send-ip.service /lib/systemd/system/
 sudo chmod 644 /lib/systemd/system/send-ip.service
 sudo systemctl daemon-reload
 sudo systemctl enable send-ip.service
