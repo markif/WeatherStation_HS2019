@@ -49,7 +49,6 @@ sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/
 sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/data/messwerte_tiefenbrunnen_2019.csv
 cd ..
 
-
 # store historic data
 sudo ./store-historic-data.sh
 ```
@@ -69,7 +68,7 @@ cd /scripts/store_data
 sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/pi/store_data/store-live-data.sh
 sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/pi/store_data/store-live-data.service
 sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/pi/store_data/store-live-data.timer
-sudo chmod u+x store-live-data.sh
+sudo chmod ugo+x store-live-data.sh
 
 # enable the unit and timer
 sudo cp store-live-data.service /lib/systemd/system/

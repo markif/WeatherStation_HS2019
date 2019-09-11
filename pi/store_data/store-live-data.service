@@ -5,8 +5,9 @@ After=network-online.target
 After=multi-user.target
 
 [Service]
+User=pi
 WorkingDirectory=/scripts/store_data
-ExecStart=/scripts/store_data/store_live_data.sh
+ExecStart=/scripts/store_data/store-live-data.sh
 
 [Install]
 WantedBy=multi-user.target
