@@ -40,9 +40,18 @@ cd /scripts/store_data
 sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/pi/store_data/store-historic-data.sh
 sudo chmod u+x store-historic-data.sh
 
+# get the historic data
+sudo mkdir data
+cd data
+sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/data/messwerte_mythenquai_2007-2018.csv
+sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/data/messwerte_tiefenbrunnen_2007-2018.csv
+sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/data/messwerte_mythenquai_2019.csv
+sudo wget https://raw.githubusercontent.com/markif/WeatherStation_HS2019/master/data/messwerte_tiefenbrunnen_2019.csv
+cd ..
+
+
 # store historic data
-sudo 
-./store-historic-data.sh
+sudo ./store-historic-data.sh
 ```
 
 ## Store Live Weather Data
@@ -65,6 +74,8 @@ sudo chmod u+x store-live-data.sh
 # enable the unit and timer
 sudo cp store-live-data.service /lib/systemd/system/
 sudo chmod 644 /lib/systemd/system/store-live-data.service
+sudo cp store-live-data.timer /lib/systemd/system/
+sudo chmod 644 /lib/systemd/system/store-live-data.timer
 sudo systemctl daemon-reload
 sudo systemctl enable store-live-data.service
 sudo systemctl enable store-live-data.timer
