@@ -1,0 +1,10 @@
+[Unit]
+Description="Stores live data periodically"
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+Unit=store-live-data.service
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=Send IP Address
+After=network.target
+After=network-online.target
+After=multi-user.target
+
+[Service]
+ExecStartPre=/bin/sleep 20
+ExecStart=/usr/bin/python3 /scripts/mail_ip/main.py
+
+[Install]
+WantedBy=multi-user.target

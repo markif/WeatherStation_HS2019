@@ -1,0 +1,11 @@
+[Unit]
+Description=Store Live Data
+After=network.target
+After=network-online.target
+After=multi-user.target
+
+[Service]
+ExecStart=/scripts/store_data/store_live_data.sh
+
+[Install]
+WantedBy=multi-user.target
