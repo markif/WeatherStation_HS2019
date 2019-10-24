@@ -28,7 +28,7 @@ import os
 
 # DB and CSV config
 config = weather.Config()
-# define CSV path
+# define CSV path (you need to define this based on your environment)
 config.historic_data_folder='.'+os.sep+'data'
 # set batch size for DB inserts (decrease for raspberry pi)
 config.historic_data_chunksize=10000
