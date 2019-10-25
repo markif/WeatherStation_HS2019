@@ -21,7 +21,7 @@ cd ..
 
 # Usage
 
-You need to run this code with Python 3.
+You need to run this code with Python 3 and make sure you adapt *config.historic_data_folder* based on your environment.
 
 ```python
 #!/usr/bin/env python3
