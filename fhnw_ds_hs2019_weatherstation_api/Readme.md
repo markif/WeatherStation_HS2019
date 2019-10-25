@@ -2,6 +2,8 @@ This library provides access to the [Wasserschutzpolizei Zurich](https://data.st
 
 # Install 
 
+This package builds on Python 3.
+
 ```bash
 sudo pip3 install fhnw_ds_hs2019_weatherstation_api
 ```
@@ -18,6 +20,8 @@ cd ..
 ```
 
 # Usage
+
+You need to run this code with Python 3.
 
 ```python
 #!/usr/bin/env python3
