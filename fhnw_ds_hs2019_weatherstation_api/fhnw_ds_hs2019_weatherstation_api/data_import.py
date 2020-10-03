@@ -116,10 +116,11 @@ def __get_data_of_day(day, station):
         response.raise_for_status()
         
 def __define_types(data, date_format):
-    data['timestamp_cet'] = pd.to_datetime(data['timestamp_cet'], format=date_format)
-    if not data.empty and data['timestamp_cet'].iloc[0].tzinfo is None:
-        data['timestamp_cet'] = data['timestamp_cet'].dt.tz_localize('Europe/Zurich', ambiguous=True).dt.tz_convert('UTC')
-    data.set_index('timestamp_cet', inplace=True)
+    if not data.empty:
+        data['timestamp_cet'] = pd.to_datetime(data['timestamp_cet'], format=date_format)
+        if data['timestamp_cet'].iloc[0].tzinfo is None:
+            data['timestamp_cet'] = data['timestamp_cet'].dt.tz_localize('Europe/Zurich', ambiguous=True).dt.tz_convert('UTC')
+        data.set_index('timestamp_cet', inplace=True)
     
     for column in data.columns[0:]:
         data[column] = data[column].astype(np.float64)
