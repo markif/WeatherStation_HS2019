@@ -297,7 +297,7 @@ def import_latest_data(config, append_to_csv=False, periodic_read=False):
                 new_data_received = True
                 __add_data_to_db(config, normalized_data, station)
                 if append_to_csv:
-                    __append_df_to_csv(normalized_data, os.path.join(config.historic_data_folder ,"messwerte_" + station + "_"+ str(current_time.year) +".csv"))
+                    __append_df_to_csv(normalized_data, os.path.join(config.historic_data_folder ,"messwerte_" + station + "_"+ str(last_db_days[idx].year) +".csv"))
                 print("Handle "+ station +" from "+ str(normalized_data.index[0]) +" to "+ str(normalized_data.index[-1])) 
             else:
                 print("No new data received for "+station)
