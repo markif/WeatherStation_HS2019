@@ -14,7 +14,7 @@ setup(name='fhnw_ds_hs2019_weatherstation_api',
       license='MIT',
       packages=['fhnw_ds_hs2019_weatherstation_api'],
       install_requires=[
-          'pandas<0.24',
+          'pandas',
           'influxdb',
           'requests',
           'tzlocal',
